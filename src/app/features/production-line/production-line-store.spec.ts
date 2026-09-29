@@ -27,6 +27,13 @@ describe('ProductionLineStore', () => {
     expect(store.products()).toEqual([first, second]);
   });
 
+  it('rejects blank IDs and compares IDs after trimming whitespace', () => {
+    expect(() => store.addProduct({ ...first, id: '   ' })).toThrow(/не может быть пустым/);
+    store.addProduct(first);
+    expect(() => store.addProduct({ ...first, id: ' first ' })).toThrow(/уже находится/);
+    expect(store.products()).toEqual([first]);
+  });
+
   it('changes only the selected product status and keeps its position', () => {
     store.addProduct(first);
     store.addProduct(second);

@@ -11,11 +11,15 @@ export class ProductionLineStore {
   readonly events = this.eventsState.asReadonly();
 
   addProduct(product: Product): void {
-    if (this.products().some((current) => current.id === product.id)) {
-      throw new Error(`Продукт с ID ${product.id} уже находится в очереди`);
+    const id = product.id.trim();
+    if (!id) {
+      throw new Error('ID продукта не может быть пустым');
+    }
+    if (this.products().some((current) => current.id === id)) {
+      throw new Error(`Продукт с ID ${id} уже находится в очереди`);
     }
 
-    this.productsState.update((products) => [...products, product]);
+    this.productsState.update((products) => [...products, { ...product, id }]);
   }
 
   changeProductStatus(id: Product['id'], status: ProductStatus): boolean {
