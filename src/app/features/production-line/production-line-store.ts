@@ -21,7 +21,7 @@ export class ProductionLineStore {
     }
 
     this.productsState.update((products) => [...products, { ...product, id }]);
-    this.recordEvent('added', id, `Продукт ${id} добавлен в очередь`);
+    this.recordEvent('added', id, 'Добавлен в очередь');
   }
 
   changeProductStatus(id: Product['id'], status: ProductStatus): boolean {
@@ -39,7 +39,7 @@ export class ProductionLineStore {
     this.recordEvent(
       'status-changed',
       id,
-      `Статус продукта ${id} изменён: ${currentProduct.status} → ${status}`,
+      `Статус изменён: ${currentProduct.status} → ${status}`,
     );
     return true;
   }
@@ -50,7 +50,7 @@ export class ProductionLineStore {
     }
 
     this.productsState.update((products) => products.filter((product) => product.id !== id));
-    this.recordEvent('removed-manually', id, `Продукт ${id} удалён вручную`);
+    this.recordEvent('removed-manually', id, 'Удалён вручную');
     return true;
   }
 
@@ -64,7 +64,7 @@ export class ProductionLineStore {
     this.recordEvent(
       'removed-on-tick',
       departingProduct.id,
-      `Продукт ${departingProduct.id} автоматически удалён после такта`,
+      'Автоматически удалён после такта',
     );
     return departingProduct;
   }

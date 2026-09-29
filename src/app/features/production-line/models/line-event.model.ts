@@ -6,6 +6,6 @@ export interface LineEvent {
   readonly id: string;
   readonly type: LineEventType;
   readonly occurredAt: Date;
-  readonly productId: Product['id'];
+  readonly productId?: Product['id'];
   readonly description: string;
 }

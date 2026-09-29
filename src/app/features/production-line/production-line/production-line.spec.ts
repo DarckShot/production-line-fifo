@@ -98,7 +98,8 @@ describe('ProductionLine status selection', () => {
 
     const element = fixture.nativeElement as HTMLElement;
     const entry = element.querySelector('app-event-log li');
-    expect(entry?.textContent).toContain('Продукт journal-product добавлен в очередь');
+    expect(entry?.textContent).toContain('Добавлен в очередь');
+    expect(entry?.textContent).toContain('ID продукта: journal-product');
     expect(entry?.querySelector('time')?.getAttribute('datetime')).toBe(
       store.events()[0].occurredAt.toISOString(),
     );

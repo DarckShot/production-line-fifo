@@ -84,10 +84,10 @@ describe('ProductionLineStore', () => {
       expect(event.productId).toMatch(/^(first|second)$/);
       expect(event.occurredAt.getTime()).toBeGreaterThanOrEqual(earliestEventTime);
       expect(event.occurredAt.getTime()).toBeLessThanOrEqual(Date.now());
-      expect(event.description).toContain(event.productId);
+      expect(event.description.length).toBeGreaterThan(0);
     }
-    expect(store.events()[0].description).toContain('автоматически удалён');
-    expect(store.events()[2].description).toContain('удалён вручную');
+    expect(store.events()[0].description).toContain('Автоматически удалён');
+    expect(store.events()[2].description).toContain('Удалён вручную');
     expect(store.events()[3].description).toContain('Отбракован');
   });
 
