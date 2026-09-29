@@ -60,9 +60,8 @@ import { ProductCard } from '../product-card/product-card';
     .direction-line { flex: 1; border-top: 2px dashed #0f766e; }
     .direction-arrow { font-size: 1.5rem; line-height: 1; }
     .track { min-height: 9rem; padding: 1rem; border: 1px dashed #94a3b8; border-radius: 14px; background: repeating-linear-gradient(135deg, #f8fafc 0, #f8fafc 14px, #f1f5f9 14px, #f1f5f9 28px); }
-    .products { display: flex; gap: .75rem; min-height: 7rem; margin: 0; padding: 0; overflow-x: auto; list-style: none; }
+    .products { display: flex; justify-content: flex-start; gap: .75rem; min-height: 7rem; margin: 0; padding: 0; overflow-x: auto; list-style: none; }
     .products li { flex: 0 0 min(14rem, 75vw); }
-    .products li:first-child { margin-inline-start: auto; }
     .empty-state { display: grid; place-items: center; min-height: 7rem; margin: 0; border-radius: 10px; background: #fff; color: #334155; text-align: center; font-weight: 600; }
     @media (max-width: 600px) {
       .line-route { grid-template-columns: 1fr auto 1fr; gap: .45rem; }

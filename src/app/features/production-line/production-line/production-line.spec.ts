@@ -89,4 +89,18 @@ describe('ProductionLine status selection', () => {
     expect(tickButton.disabled).toBe(true);
     expect(element.textContent).toContain('Очередь пуста');
   });
+
+  it('renders a new journal entry after a product is added', async () => {
+    const fixture = TestBed.createComponent(ProductionLine);
+    const store = fixture.debugElement.injector.get(ProductionLineStore);
+    store.addProduct({ id: 'journal-product', arrivedAt: new Date(), status: 'В очереди' });
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const entry = element.querySelector('app-event-log li');
+    expect(entry?.textContent).toContain('Продукт journal-product добавлен в очередь');
+    expect(entry?.querySelector('time')?.getAttribute('datetime')).toBe(
+      store.events()[0].occurredAt.toISOString(),
+    );
+  });
 });

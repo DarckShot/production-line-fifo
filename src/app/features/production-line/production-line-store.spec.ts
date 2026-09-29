@@ -63,4 +63,50 @@ describe('ProductionLineStore', () => {
     expect(store.products()).toEqual([]);
     expect(store.nextTick()).toBeUndefined();
   });
+
+  it('records all four event types with time, product ID, and description', () => {
+    const earliestEventTime = Date.now();
+    store.addProduct(first);
+    store.changeProductStatus('first', 'Отбракован');
+    store.removeProduct('first');
+    store.addProduct(second);
+    store.nextTick();
+
+    expect(store.events().map((event) => event.type)).toEqual([
+      'removed-on-tick',
+      'added',
+      'removed-manually',
+      'status-changed',
+      'added',
+    ]);
+    expect(new Set(store.events().map((event) => event.id)).size).toBe(5);
+    for (const event of store.events()) {
+      expect(event.productId).toMatch(/^(first|second)$/);
+      expect(event.occurredAt.getTime()).toBeGreaterThanOrEqual(earliestEventTime);
+      expect(event.occurredAt.getTime()).toBeLessThanOrEqual(Date.now());
+      expect(event.description).toContain(event.productId);
+    }
+    expect(store.events()[0].description).toContain('автоматически удалён');
+    expect(store.events()[2].description).toContain('удалён вручную');
+    expect(store.events()[3].description).toContain('Отбракован');
+  });
+
+  it('keeps only the 20 most recent events and skips operations that did not change state', () => {
+    store.nextTick();
+    store.removeProduct('missing');
+    store.changeProductStatus('missing', 'Проверен');
+    expect(store.events()).toEqual([]);
+
+    for (let index = 1; index <= 25; index += 1) {
+      store.addProduct({ ...first, id: String(index) });
+    }
+    expect(store.events()).toHaveLength(20);
+    expect(store.events()[0].productId).toBe('25');
+    expect(store.events()[19].productId).toBe('6');
+
+    store.changeProductStatus('25', 'В очереди');
+    expect(store.events()).toHaveLength(20);
+    expect(store.events()[0].productId).toBe('25');
+    expect(store.events()[0].type).toBe('added');
+  });
 });

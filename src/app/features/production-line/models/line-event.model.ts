@@ -1,11 +1,11 @@
-import type { ProductStatus } from './product.model';
+import type { Product } from './product.model';
 
-export type LineEventType = 'added' | 'status-changed' | 'removed';
+export type LineEventType = 'added' | 'status-changed' | 'removed-manually' | 'removed-on-tick';
 
 export interface LineEvent {
   readonly id: string;
-  readonly productId: string;
-  readonly occurredAt: Date;
   readonly type: LineEventType;
-  readonly status?: ProductStatus;
+  readonly occurredAt: Date;
+  readonly productId: Product['id'];
+  readonly description: string;
 }
