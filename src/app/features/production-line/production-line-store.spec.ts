@@ -20,13 +20,32 @@ describe('ProductionLineStore', () => {
     store = new ProductionLineStore();
   });
 
-  it('keeps products in insertion order and rejects duplicate IDs', () => {
+  it('adds a product with its ID, arrival time, and status', () => {
+    store.addProduct(first);
+
+    expect(store.products()).toEqual([first]);
+    expect(store.events()).toHaveLength(1);
+    expect(store.events()[0]).toMatchObject({ type: 'added', productId: 'first' });
+  });
+
+  it('adds multiple products to the end in FIFO order', () => {
     store.addProduct(first);
     store.addProduct(second);
+    const third: Product = { ...first, id: 'third', status: 'Отбракован' };
+    store.addProduct(third);
 
-    expect(store.products()).toEqual([first, second]);
+    expect(store.products()).toEqual([first, second, third]);
+    expect(store.products().map((product) => product.id)).toEqual(['first', 'second', 'third']);
+  });
+
+  it('rejects duplicate IDs without changing the queue or journal', () => {
+    store.addProduct(first);
+    store.addProduct(second);
+    const eventsBefore = store.events();
+
     expect(() => store.addProduct({ ...first, status: 'Отбракован' })).toThrow(/уже находится/);
     expect(store.products()).toEqual([first, second]);
+    expect(store.events()).toEqual(eventsBefore);
   });
 
   it('rejects blank IDs and compares IDs after trimming whitespace', () => {
@@ -45,25 +64,40 @@ describe('ProductionLineStore', () => {
     expect(store.changeProductStatus('missing', 'Проверен')).toBe(false);
   });
 
-  it('removes only the selected product', () => {
+  it('removes a product from the middle without reordering its neighbors', () => {
     store.addProduct(first);
     store.addProduct(second);
+    const third: Product = { ...first, id: 'third' };
+    store.addProduct(third);
 
-    expect(store.removeProduct('first')).toBe(true);
-    expect(store.products()).toEqual([second]);
+    expect(store.removeProduct('second')).toBe(true);
+    expect(store.products()).toEqual([first, third]);
+    expect(store.events()[0]).toMatchObject({ type: 'removed-manually', productId: 'second' });
     expect(store.removeProduct('missing')).toBe(false);
   });
 
-  it('advances FIFO on each tick and safely handles an empty queue', () => {
-    expect(store.nextTick()).toBeUndefined();
+  it('removes the oldest product on each tick and preserves survivor order', () => {
     store.addProduct(first);
     store.addProduct(second);
+    const third: Product = { ...first, id: 'third' };
+    store.addProduct(third);
 
     expect(store.nextTick()).toEqual(first);
-    expect(store.products()).toEqual([second]);
+    expect(store.products()).toEqual([second, third]);
+    expect(store.events()[0]).toMatchObject({ type: 'removed-on-tick', productId: 'first' });
     expect(store.nextTick()).toEqual(second);
+    expect(store.products()).toEqual([third]);
+    expect(store.nextTick()).toEqual(third);
     expect(store.products()).toEqual([]);
+  });
+
+  it('safely handles an empty queue without recording an event', () => {
     expect(store.nextTick()).toBeUndefined();
+    expect(store.products()).toEqual([]);
+    expect(store.events()).toEqual([]);
+    expect(store.removeProduct('missing')).toBe(false);
+    expect(store.changeProductStatus('missing', 'Проверен')).toBe(false);
+    expect(store.events()).toEqual([]);
   });
 
   it('records all four event types with time, product ID, and description', () => {
