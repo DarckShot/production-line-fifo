@@ -3,7 +3,7 @@ import type { LineEvent } from '../models/line-event.model';
 import { EventLog } from './event-log';
 
 describe('EventLog', () => {
-  it('numbers events from the earliest to the latest', async () => {
+  it('shows events without numbering from the latest to the earliest', async () => {
     const events: LineEvent[] = Array.from({ length: 6 }, (_, index) => ({
       id: String(6 - index),
       type: 'added',
@@ -15,13 +15,15 @@ describe('EventLog', () => {
     fixture.componentRef.setInput('events', events);
     await fixture.whenStable();
 
-    const entries = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ol li')];
+    const element = fixture.nativeElement as HTMLElement;
+    const entries = [...element.querySelectorAll('ul.entries li')];
     expect(entries).toHaveLength(6);
-    expect(entries[0].textContent).toContain('Событие 1');
-    expect(entries[0].textContent).toContain('ID продукта: 1');
-    expect(entries[5].textContent).toContain('Событие 6');
-    expect(entries[5].textContent).toContain('Последнее событие');
-    expect(entries[0].textContent).not.toContain('Последнее событие');
+    expect(element.querySelector('ol')).toBeNull();
+    expect(entries[0].textContent).toContain('Событие 6');
+    expect(entries[0].textContent).toContain('Последнее событие');
+    expect(entries[5].textContent).toContain('Событие 1');
+    expect(entries[5].textContent).toContain('ID продукта: 1');
+    expect(entries[5].textContent).not.toContain('Последнее событие');
   });
 
   it('shows only the 20 newest entries and omits an absent product ID', async () => {
@@ -37,11 +39,11 @@ describe('EventLog', () => {
     fixture.componentRef.setInput('events', events);
     await fixture.whenStable();
 
-    const entries = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ol li')];
+    const entries = [...(fixture.nativeElement as HTMLElement).querySelectorAll('ul.entries li')];
     expect(entries).toHaveLength(20);
-    expect(entries[0].textContent).toContain('Событие 6');
-    expect(entries[19].textContent).toContain('Событие 25');
-    expect(entries[19].textContent).not.toContain('ID продукта:');
+    expect(entries[0].textContent).toContain('Событие 25');
+    expect(entries[0].textContent).not.toContain('ID продукта:');
+    expect(entries[19].textContent).toContain('Событие 6');
   });
 
   it('shows an unnumbered empty state', async () => {
@@ -50,7 +52,7 @@ describe('EventLog', () => {
     await fixture.whenStable();
 
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('ol')).toBeNull();
+    expect(element.querySelector('.entries')).toBeNull();
     expect(element.textContent).toContain('Событий пока нет');
   });
 });

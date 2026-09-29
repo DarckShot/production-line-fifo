@@ -9,12 +9,13 @@ import { ProductCard } from '../product-card/product-card';
     <section class="line-panel" aria-labelledby="queue-heading">
       <div class="panel-heading">
         <div>
-          <p class="eyebrow">Производственный участок</p>
+          <p class="eyebrow">03 / Производственный участок</p>
           <h2 id="queue-heading">FIFO-очередь</h2>
         </div>
         <p class="queue-count">Продуктов: {{ products().length }}</p>
       </div>
 
+      <p class="line-caption">Поток продуктов <span aria-hidden="true">/</span> от входа к выходу</p>
       <div class="line-route" aria-label="Направление движения: от датчика входа к датчику отбраковки">
         <div class="sensor">
           <span class="sensor-light sensor-light--entry" aria-hidden="true"></span>
@@ -45,23 +46,25 @@ import { ProductCard } from '../product-card/product-card';
   `,
   styles: `
     :host { display: block; min-width: 0; }
-    .line-panel { border: 1px solid #cbd5e1; border-radius: 20px; background: #fff; padding: clamp(1rem, 3vw, 2rem); box-shadow: 0 12px 32px #0f172a0d; }
+    .line-panel { min-height: 100%; padding: clamp(1rem, 2.5vw, 1.7rem); border: 1px solid #d3dcdf; border-radius: 16px; background: #fff; box-shadow: 0 4px 18px #1b3b4510; }
     .panel-heading { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
-    .eyebrow { margin: 0 0 .3rem; color: #475569; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    h2 { margin: 0; color: #0f172a; font-size: clamp(1.35rem, 2.4vw, 1.8rem); }
-    .queue-count { margin: 0; padding: .4rem .75rem; border-radius: 999px; background: #e2e8f0; color: #243247; font-size: .875rem; font-weight: 700; }
-    .line-route { display: grid; grid-template-columns: minmax(7rem, auto) minmax(2rem, 1fr) minmax(9rem, auto); align-items: center; gap: .75rem; margin: 1.7rem 0 1rem; }
-    .sensor { display: flex; align-items: center; gap: .55rem; color: #1e293b; font-size: .85rem; font-weight: 700; }
+    .eyebrow { margin: 0 0 .65rem; color: #246c69; font-family: ui-monospace, monospace; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    h2 { margin: 0; color: #162e39; font-size: clamp(1.45rem, 2.5vw, 1.85rem); letter-spacing: -.035em; }
+    .queue-count { margin: 0; padding: .45rem .7rem; border: 1px solid #d0dddc; border-radius: 7px; background: #ecf4f3; color: #185c57; font-family: ui-monospace, monospace; font-size: .78rem; font-weight: 800; }
+    .line-caption { margin: clamp(2rem, 5vw, 4.5rem) 0 .65rem; color: #52656d; font-size: .75rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .line-caption span { margin: 0 .25rem; color: #b07525; }
+    .line-route { display: grid; grid-template-columns: minmax(7rem, auto) minmax(2rem, 1fr) minmax(9rem, auto); align-items: center; gap: .75rem; margin: 0 0 1rem; }
+    .sensor { display: flex; align-items: center; gap: .55rem; color: #223b45; font-size: .82rem; font-weight: 800; line-height: 1.3; }
     .sensor--exit { justify-content: flex-end; text-align: right; }
-    .sensor-light { flex: none; width: .65rem; height: .65rem; border-radius: 50%; box-shadow: 0 0 0 4px #e2e8f0; }
-    .sensor-light--entry { background: #047857; }
-    .sensor-light--exit { background: #b45309; }
-    .direction { display: flex; align-items: center; color: #0f766e; }
-    .direction-line { flex: 1; border-top: 2px dashed #0f766e; }
-    .direction-arrow { font-size: 1.5rem; line-height: 1; }
-    .track { min-height: 9rem; padding: 1rem; border: 1px dashed #94a3b8; border-radius: 14px; background: repeating-linear-gradient(135deg, #f8fafc 0, #f8fafc 14px, #f1f5f9 14px, #f1f5f9 28px); }
-    .products { display: flex; justify-content: flex-start; gap: .75rem; min-height: 7rem; margin: 0; padding: 0; overflow-x: auto; list-style: none; }
-    .products li { flex: 0 0 min(14rem, 75vw); }
+    .sensor-light { flex: none; width: .7rem; height: .7rem; border-radius: 50%; }
+    .sensor-light--entry { background: #178a70; box-shadow: 0 0 0 4px #178a702e; }
+    .sensor-light--exit { background: #bd7622; box-shadow: 0 0 0 4px #bd76222e; }
+    .direction { display: flex; align-items: center; color: #176e68; }
+    .direction-line { flex: 1; border-top: 2px dashed #7ca5a2; }
+    .direction-arrow { margin-left: .25rem; font-size: 1.5rem; line-height: 1; }
+    .track { min-height: 22rem; padding: 1rem; border: 1px solid #c7d4d7; border-radius: 12px; background: linear-gradient(90deg, #176e6817 0 3px, transparent 3px calc(100% - 3px), #bd762228 calc(100% - 3px)), repeating-linear-gradient(0deg, #f4f7f7 0 23px, #edf2f2 23px 24px); }
+    .products { display: flex; justify-content: flex-start; gap: .8rem; min-height: 19.8rem; margin: 0; padding: .15rem .15rem .55rem; overflow-x: auto; list-style: none; scrollbar-color: #93aaa9 transparent; }
+    .products li { flex: 0 0 min(13.5rem, 72vw); }
     .product-leaving { animation: product-exit 320ms ease-in forwards; pointer-events: none; }
     .products-leaving { animation: queue-exit 320ms ease-in forwards; pointer-events: none; }
     @keyframes product-exit { to { opacity: 0; transform: translateX(2rem); } }
@@ -69,12 +72,15 @@ import { ProductCard } from '../product-card/product-card';
     @media (prefers-reduced-motion: reduce) {
       .product-leaving, .products-leaving { animation-duration: 1ms; }
     }
-    .empty-state { display: grid; place-items: center; min-height: 7rem; margin: 0; border-radius: 10px; background: #fff; color: #334155; text-align: center; font-weight: 600; }
+    .empty-state { display: grid; place-items: center; min-height: 19.8rem; margin: 0; padding: 1rem; border: 1px dashed #9bb0b3; border-radius: 8px; background: #ffffffb5; color: #485e67; text-align: center; font-weight: 650; }
     @media (max-width: 600px) {
       .line-route { grid-template-columns: 1fr auto 1fr; gap: .45rem; }
       .sensor { align-items: flex-start; flex-direction: column; font-size: .72rem; }
       .sensor--exit { align-items: flex-end; }
       .direction { align-self: start; margin-top: .2rem; }
+      .line-caption { margin-top: 2rem; }
+      .track { min-height: 19rem; padding: .7rem; }
+      .products, .empty-state { min-height: 17rem; }
     }
   `,
 })

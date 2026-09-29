@@ -1,4 +1,12 @@
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+:root {
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  color: #172b39;
+  background: #e9eef0;
+  font-synthesis: none;
 }
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input, select { font: inherit; }
+button { touch-action: manipulation; }
+::selection { background: #b9e4de; color: #173a38; }
