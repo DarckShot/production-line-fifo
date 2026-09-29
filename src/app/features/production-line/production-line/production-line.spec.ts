@@ -94,6 +94,39 @@ describe('ProductionLine status selection', () => {
     expect(element.textContent).toContain('Очередь пуста');
   });
 
+  it('animates remaining cards without delaying a tick or changing FIFO order', async () => {
+    const originalAnimate = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'animate');
+    const animate = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, 'animate', { configurable: true, value: animate });
+
+    try {
+      const fixture = TestBed.createComponent(ProductionLine);
+      const store = fixture.debugElement.injector.get(ProductionLineStore);
+      for (const id of ['first', 'second', 'third']) {
+        store.addProduct({ id, arrivedAt: new Date('2026-01-01T10:00:00Z'), status: 'В очереди' });
+      }
+      await fixture.whenStable();
+
+      const button = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('app-line-controls button')!;
+      button.click();
+
+      expect(animate).toHaveBeenCalledTimes(2);
+      expect(animate.mock.calls[0][0]).toEqual([
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(1.5rem)', offset: 0.7 },
+        { transform: 'translateX(0)' },
+      ]);
+      expect(store.products().map((product) => product.id)).toEqual(['second', 'third']);
+      expect(store.events()[0].type).toBe('removed-on-tick');
+    } finally {
+      if (originalAnimate) {
+        Object.defineProperty(HTMLElement.prototype, 'animate', originalAnimate);
+      } else {
+        delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+      }
+    }
+  });
+
   it('renders a new journal entry after a product is added', async () => {
     const fixture = TestBed.createComponent(ProductionLine);
     const store = fixture.debugElement.injector.get(ProductionLineStore);

@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, ElementRef, computed, inject, input, output } from '@angular/core';
 import type { Product, ProductStatus } from '../models/product.model';
 import { ProductCard } from '../product-card/product-card';
 
@@ -32,9 +32,9 @@ import { ProductCard } from '../product-card/product-card';
 
       <div class="track">
         @if (products().length) {
-          <ol class="products" aria-label="Продукты от входа к выходу">
+          <ol class="products" aria-label="Продукты от входа к выходу" animate.leave="products-leaving">
             @for (product of productsFromEntryToExit(); track product.id) {
-              <li><app-product-card [product]="product" (statusChanged)="statusChanged.emit({ id: product.id, status: $event })" (removed)="removed.emit(product.id)" /></li>
+              <li animate.leave="product-leaving"><app-product-card [product]="product" (statusChanged)="statusChanged.emit({ id: product.id, status: $event })" (removed)="removed.emit(product.id)" /></li>
             }
           </ol>
         } @else {
@@ -62,6 +62,13 @@ import { ProductCard } from '../product-card/product-card';
     .track { min-height: 9rem; padding: 1rem; border: 1px dashed #94a3b8; border-radius: 14px; background: repeating-linear-gradient(135deg, #f8fafc 0, #f8fafc 14px, #f1f5f9 14px, #f1f5f9 28px); }
     .products { display: flex; justify-content: flex-start; gap: .75rem; min-height: 7rem; margin: 0; padding: 0; overflow-x: auto; list-style: none; }
     .products li { flex: 0 0 min(14rem, 75vw); }
+    .product-leaving { animation: product-exit 320ms ease-in forwards; pointer-events: none; }
+    .products-leaving { animation: queue-exit 320ms ease-in forwards; pointer-events: none; }
+    @keyframes product-exit { to { opacity: 0; transform: translateX(2rem); } }
+    @keyframes queue-exit { to { opacity: 0; transform: translateX(2rem); } }
+    @media (prefers-reduced-motion: reduce) {
+      .product-leaving, .products-leaving { animation-duration: 1ms; }
+    }
     .empty-state { display: grid; place-items: center; min-height: 7rem; margin: 0; border-radius: 10px; background: #fff; color: #334155; text-align: center; font-weight: 600; }
     @media (max-width: 600px) {
       .line-route { grid-template-columns: 1fr auto 1fr; gap: .45rem; }
@@ -72,8 +79,26 @@ import { ProductCard } from '../product-card/product-card';
   `,
 })
 export class ProductQueue {
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly products = input.required<readonly Product[]>();
   readonly statusChanged = output<{ id: Product['id']; status: ProductStatus }>();
   readonly removed = output<Product['id']>();
   protected readonly productsFromEntryToExit = computed(() => [...this.products()].reverse());
+
+  animateNextTick(): void {
+    if (globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    const cards = this.element.nativeElement.querySelectorAll<HTMLElement>('.products > li:not(.product-leaving)');
+    for (const card of [...cards].slice(0, -1)) {
+      card.animate?.(
+        [
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(1.5rem)', offset: 0.7 },
+          { transform: 'translateX(0)' },
+        ],
+        { duration: 380, easing: 'ease-in-out' },
+      );
+    }
+  }
 }

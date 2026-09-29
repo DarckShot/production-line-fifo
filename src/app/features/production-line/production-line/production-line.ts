@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import { EventLog } from '../event-log/event-log';
 import { LineControls } from '../line-controls/line-controls';
 import { ProductForm } from '../product-form/product-form';
@@ -18,7 +18,7 @@ import { ProductionLineStore } from '../production-line-store';
       </header>
       <div class="tools">
         <app-product-form />
-        <app-line-controls [productCount]="store.products().length" (tickRequested)="store.nextTick()" />
+        <app-line-controls [productCount]="store.products().length" (tickRequested)="onNextTick()" />
       </div>
       <app-product-queue [products]="store.products()" (statusChanged)="store.changeProductStatus($event.id, $event.status)" (removed)="store.removeProduct($event)" />
       <app-event-log [events]="store.events()" />
@@ -36,4 +36,13 @@ import { ProductionLineStore } from '../production-line-store';
 })
 export class ProductionLine {
   protected readonly store = inject(ProductionLineStore);
+  private readonly queue = viewChild(ProductQueue);
+
+  protected onNextTick(): void {
+    if (!this.store.products().length) {
+      return;
+    }
+    this.queue()?.animateNextTick();
+    this.store.nextTick();
+  }
 }
