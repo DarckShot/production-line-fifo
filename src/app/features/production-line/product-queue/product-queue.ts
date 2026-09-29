@@ -1,5 +1,5 @@
-import { Component, computed, input } from '@angular/core';
-import type { Product } from '../models/product.model';
+import { Component, computed, input, output } from '@angular/core';
+import type { Product, ProductStatus } from '../models/product.model';
 import { ProductCard } from '../product-card/product-card';
 
 @Component({
@@ -34,7 +34,7 @@ import { ProductCard } from '../product-card/product-card';
         @if (products().length) {
           <ol class="products" aria-label="Продукты от входа к выходу">
             @for (product of productsFromEntryToExit(); track product.id) {
-              <li><app-product-card [product]="product" /></li>
+              <li><app-product-card [product]="product" (statusChanged)="statusChanged.emit({ id: product.id, status: $event })" /></li>
             }
           </ol>
         } @else {
@@ -73,5 +73,6 @@ import { ProductCard } from '../product-card/product-card';
 })
 export class ProductQueue {
   readonly products = input.required<readonly Product[]>();
+  readonly statusChanged = output<{ id: Product['id']; status: ProductStatus }>();
   protected readonly productsFromEntryToExit = computed(() => [...this.products()].reverse());
 }
