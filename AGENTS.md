@@ -1,5 +1,9 @@
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+## Проверка по тестовому заданию
+
+При каждой работе над этим проектом прочитай актуальный файл `Тестовое Front Middle_0826.md` из корня репозитория и перед завершением сверь с ним затронутые требования. Для полной проверки проекта пройди по всем обязательным пунктам и отдельно укажи необязательные. Успешная сборка и тесты сами по себе не подтверждают выполнение задания. Используй общий навык `check-front-middle-assignment`, если он доступен.
+
 ## TypeScript Best Practices
 
 - Use strict type checking
