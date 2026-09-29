@@ -33,4 +33,29 @@ describe('ProductionLine status selection', () => {
     expect(select.value).toBe('Проверен');
     expect(cards[1].querySelector('.status')?.textContent).toContain('В очереди');
   });
+
+  it('removes the selected product and keeps the others in FIFO order', async () => {
+    const fixture = TestBed.createComponent(ProductionLine);
+    const store = fixture.debugElement.injector.get(ProductionLineStore);
+    const arrivedAt = new Date('2026-01-01T10:00:00Z');
+    for (const id of ['first', 'middle', 'last']) {
+      store.addProduct({ id, arrivedAt, status: 'В очереди' });
+    }
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const removeButton = element.querySelector<HTMLButtonElement>(
+      'button[aria-label="Удалить продукт middle"]',
+    )!;
+    removeButton.click();
+    await fixture.whenStable();
+
+    expect(store.products().map((product) => product.id)).toEqual(['first', 'last']);
+    expect([...element.querySelectorAll('app-product-card h3')].map((heading) => heading.textContent)).toEqual([
+      'last',
+      'first',
+    ]);
+    expect(element.querySelector('button[aria-label="Удалить продукт middle"]')).toBeNull();
+    expect(element.textContent).toContain('Продуктов: 2');
+  });
 });

@@ -34,7 +34,7 @@ import { ProductCard } from '../product-card/product-card';
         @if (products().length) {
           <ol class="products" aria-label="Продукты от входа к выходу">
             @for (product of productsFromEntryToExit(); track product.id) {
-              <li><app-product-card [product]="product" (statusChanged)="statusChanged.emit({ id: product.id, status: $event })" /></li>
+              <li><app-product-card [product]="product" (statusChanged)="statusChanged.emit({ id: product.id, status: $event })" (removed)="removed.emit(product.id)" /></li>
             }
           </ol>
         } @else {
@@ -74,5 +74,6 @@ import { ProductCard } from '../product-card/product-card';
 export class ProductQueue {
   readonly products = input.required<readonly Product[]>();
   readonly statusChanged = output<{ id: Product['id']; status: ProductStatus }>();
+  readonly removed = output<Product['id']>();
   protected readonly productsFromEntryToExit = computed(() => [...this.products()].reverse());
 }

@@ -20,7 +20,7 @@ import { ProductionLineStore } from '../production-line-store';
         <app-product-form />
         <app-line-controls />
       </div>
-      <app-product-queue [products]="store.products()" (statusChanged)="store.changeProductStatus($event.id, $event.status)" />
+      <app-product-queue [products]="store.products()" (statusChanged)="store.changeProductStatus($event.id, $event.status)" (removed)="store.removeProduct($event)" />
       <app-event-log [events]="store.events()" />
     </main>
   `,

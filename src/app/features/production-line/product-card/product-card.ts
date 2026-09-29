@@ -31,6 +31,9 @@ import { PRODUCT_STATUSES, type Product, type ProductStatus } from '../models/pr
           }
         </select>
       </label>
+      <button type="button" class="remove-button" [attr.aria-label]="'Удалить продукт ' + product().id" (click)="removed.emit()">
+        Удалить
+      </button>
     </article>
   `,
   styles: `
@@ -47,11 +50,15 @@ import { PRODUCT_STATUSES, type Product, type ProductStatus } from '../models/pr
     .status-label { display: grid; gap: .35rem; margin-top: 1rem; color: #334155; font-size: .8rem; font-weight: 700; }
     select { box-sizing: border-box; width: 100%; min-height: 44px; padding: .45rem .6rem; border: 1px solid #64748b; border-radius: 8px; background: #fff; color: #0f172a; font: inherit; font-size: .9rem; cursor: pointer; }
     select:focus-visible { outline: 3px solid #0f766e; outline-offset: 2px; }
+    .remove-button { box-sizing: border-box; width: 100%; min-height: 44px; margin-top: .75rem; padding: .5rem .75rem; border: 1px solid #b91c1c; border-radius: 8px; background: #fff; color: #991b1b; font: inherit; font-size: .9rem; font-weight: 700; cursor: pointer; }
+    .remove-button:hover { background: #fef2f2; }
+    .remove-button:focus-visible { outline: 3px solid #0f766e; outline-offset: 2px; }
   `,
 })
 export class ProductCard {
   readonly product = input.required<Product>();
   readonly statusChanged = output<ProductStatus>();
+  readonly removed = output<void>();
   protected readonly statuses = PRODUCT_STATUSES;
 
   protected onStatusChange(event: Event): void {
