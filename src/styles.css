@@ -1,12 +1,20 @@
 :root {
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
-  color: #172b39;
-  background: #e9eef0;
+  color: #19312e;
+  background: #f3f5f1;
   font-synthesis: none;
+  --ink: #19312e;
+  --muted: #60736d;
+  --green: #176958;
+  --green-deep: #103d35;
+  --lime: #d8ed85;
+  --line: #dce5df;
+  --paper: #fff;
+  --shadow: 0 12px 36px #153d3010;
 }
 
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
 button, input, select { font: inherit; }
 button { touch-action: manipulation; }
-::selection { background: #b9e4de; color: #173a38; }
+::selection { background: #d8ed85; color: #19312e; }

@@ -4,32 +4,32 @@ import { Component, input, output } from '@angular/core';
   selector: 'app-line-controls',
   template: `
     <section aria-labelledby="line-controls-heading">
-      <p class="eyebrow">02 / Ритм линии</p>
-      <h2 id="line-controls-heading">Управление линией</h2>
-      <p>За один такт продукт у выхода покидает линию.</p>
+      <p class="eyebrow">УПРАВЛЕНИЕ ПОТОКОМ</p>
+      <h2 id="line-controls-heading">Следующий такт</h2>
+      <p>Продукты сдвинутся к выходу. Крайний продукт покинет линию.</p>
       <div class="control-footer">
         <span class="count">В очереди <strong>{{ productCount() }}</strong></span>
-      <button type="button" [disabled]="productCount() === 0" (click)="tickRequested.emit()">
-        Следующий такт <span aria-hidden="true">→</span>
-      </button>
+        <button type="button" [disabled]="productCount() === 0" (click)="tickRequested.emit()">
+          Следующий такт <span aria-hidden="true">→</span>
+        </button>
       </div>
     </section>
   `,
   styles: `
     :host { display: block; }
-    section { height: 100%; padding: 1.4rem; border: 1px solid #d3dcdf; border-radius: 16px; background: #fff; box-shadow: 0 4px 18px #1b3b4510; }
-    .eyebrow { margin: 0 0 .65rem; color: #246c69; font-family: ui-monospace, monospace; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-    h2 { margin: 0; color: #162e39; font-size: 1.25rem; letter-spacing: -.025em; }
-    section > p:not(.eyebrow) { margin: .4rem 0 1.25rem; color: #52656d; font-size: .88rem; line-height: 1.45; }
-    .control-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .7rem; }
-    .count { color: #52656d; font-size: .8rem; font-weight: 700; }
-    .count strong { display: inline-grid; place-items: center; min-width: 1.7rem; height: 1.7rem; margin-left: .3rem; border-radius: 5px; background: #e5efee; color: #125b56; font-family: ui-monospace, monospace; }
-    button { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; padding: .55rem .8rem; border: 0; border-radius: 8px; background: #d5912e; color: #172b39; font-weight: 800; cursor: pointer; }
-    button:hover:not(:disabled) { background: #edaa45; }
-    button:focus-visible { outline: 3px solid #176e68; outline-offset: 3px; }
-    button:disabled { background: #dbe2e2; color: #52656d; cursor: not-allowed; }
+    section { height: 100%; padding: 1.25rem; border: 1px solid #d7e4cc; border-radius: 16px; background: #eaf2e0; box-shadow: var(--shadow); }
+    .eyebrow { margin: 0 0 .75rem; color: #436942; font-family: ui-monospace, monospace; font-size: .62rem; font-weight: 800; letter-spacing: .09em; }
+    h2 { margin: 0; color: #23462e; font-size: 1.25rem; font-weight: 800; letter-spacing: -.04em; line-height: 1.15; }
+    section > p:not(.eyebrow) { margin: .5rem 0 1.3rem; color: #4b6650; font-size: .78rem; line-height: 1.45; }
+    .control-footer { display: grid; gap: .75rem; }
+    .count { display: flex; align-items: center; justify-content: space-between; color: #36593c; font-size: .75rem; font-weight: 750; }
+    .count strong { display: inline-grid; place-items: center; min-width: 1.8rem; height: 1.8rem; border: 1px solid #bed3b5; border-radius: 5px; background: #fff; color: #1d5a3b; font-family: ui-monospace, monospace; }
+    button { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 46px; padding: .6rem .8rem; border: 0; border-radius: 7px; background: #213e2d; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; transition: background 160ms, transform 160ms; }
+    button:hover:not(:disabled) { background: #315a3e; transform: translateY(-1px); }
+    button:focus-visible { outline: 3px solid #176958; outline-offset: 3px; }
+    button:disabled { background: #cddbc9; color: #4d6551; cursor: not-allowed; }
     button span { font-size: 1.2rem; line-height: 1; }
-    @media (max-width: 900px) and (min-width: 621px) { .control-footer { align-items: flex-start; flex-direction: column; } }
+    @media (prefers-reduced-motion: reduce) { button { transition: none; } }
   `,
 })
 export class LineControls {

@@ -17,16 +17,19 @@ describe('ProductionLine status selection', () => {
 
     const element = fixture.nativeElement as HTMLElement;
     const cards = [...element.querySelectorAll('app-product-card')];
-    const select = cards[0].querySelector<HTMLSelectElement>('select')!;
+    const trigger = cards[0].querySelector<HTMLButtonElement>('.status-trigger')!;
+    const options = [...cards[0].querySelectorAll<HTMLElement>('[role="option"]')];
     expect(cards[0].querySelector('h3')?.textContent).toBe('second');
-    expect([...select.options].map((option) => option.value)).toEqual([
+    expect(options.map((option) => option.textContent?.trim())).toEqual([
       'В очереди',
       'Проверен',
       'Отбракован',
     ]);
 
-    select.value = 'Проверен';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+    trigger.click();
+    await fixture.whenStable();
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    options[1].click();
     await fixture.whenStable();
 
     expect(store.products().map((product) => [product.id, product.status])).toEqual([
@@ -34,8 +37,34 @@ describe('ProductionLine status selection', () => {
       ['second', 'Проверен'],
     ]);
     expect(cards[0].querySelector('.status')?.textContent).toContain('Проверен');
-    expect(select.value).toBe('Проверен');
+    expect(trigger.textContent).toContain('Проверен');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(cards[1].querySelector('.status')?.textContent).toContain('В очереди');
+  });
+
+  it('opens the status menu for the chosen card and closes it on a second click', async () => {
+    const fixture = TestBed.createComponent(ProductionLine);
+    const store = fixture.debugElement.injector.get(ProductionLineStore);
+    for (const id of ['first', 'middle', 'last']) {
+      store.addProduct({ id, arrivedAt: new Date('2026-01-01T10:00:00Z'), status: 'В очереди' });
+    }
+    await fixture.whenStable();
+
+    const cards = [...(fixture.nativeElement as HTMLElement).querySelectorAll('app-product-card')];
+    const middleCard = cards[1];
+    const trigger = middleCard.querySelector<HTMLButtonElement>('.status-trigger')!;
+    expect(middleCard.querySelector('h3')?.textContent).toBe('middle');
+    expect(middleCard.querySelector('[role="listbox"]')).not.toBeNull();
+
+    trigger.click();
+    await fixture.whenStable();
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(cards[0].querySelector('.status-trigger')?.getAttribute('aria-expanded')).toBe('false');
+
+    trigger.click();
+    await fixture.whenStable();
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(store.products().map((product) => product.status)).toEqual(['В очереди', 'В очереди', 'В очереди']);
   });
 
   it('removes the selected product and keeps the others in FIFO order', async () => {
@@ -61,6 +90,33 @@ describe('ProductionLine status selection', () => {
     ]);
     expect(element.querySelector('button[aria-label="Удалить продукт middle"]')).toBeNull();
     expect(element.textContent).toContain('Продуктов: 2');
+    expect([...element.querySelectorAll<HTMLElement>('.products > li')].map((card) => card.style.getPropertyValue('--slot')))
+      .toEqual(['0', '1']);
+  });
+
+  it('closes the entry gap when a product is manually removed after a tick', async () => {
+    const fixture = TestBed.createComponent(ProductionLine);
+    const store = fixture.debugElement.injector.get(ProductionLineStore);
+    const arrivedAt = new Date('2026-01-01T10:00:00Z');
+    for (const id of ['first', 'second', 'third']) {
+      store.addProduct({ id, arrivedAt, status: 'В очереди' });
+    }
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const slots = () => [...element.querySelectorAll<HTMLElement>('.products > li')].map((card) => [
+      card.querySelector('h3')?.textContent,
+      card.style.getPropertyValue('--slot'),
+    ]);
+    element.querySelector<HTMLButtonElement>('app-line-controls button')!.click();
+    await fixture.whenStable();
+    expect(slots()).toEqual([['third', '1'], ['second', '2']]);
+
+    element.querySelector<HTMLButtonElement>('button[aria-label="Удалить продукт third"]')!.click();
+    await fixture.whenStable();
+    expect(store.products().map((product) => product.id)).toEqual(['second']);
+    expect(slots()).toEqual([['second', '0']]);
+    expect(store.events()[0].type).toBe('removed-manually');
   });
 
   it('advances products toward the exit and removes the oldest on each click', async () => {
@@ -94,37 +150,44 @@ describe('ProductionLine status selection', () => {
     expect(element.textContent).toContain('Очередь пуста');
   });
 
-  it('animates remaining cards without delaying a tick or changing FIFO order', async () => {
-    const originalAnimate = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'animate');
-    const animate = vi.fn();
-    Object.defineProperty(HTMLElement.prototype, 'animate', { configurable: true, value: animate });
-
-    try {
-      const fixture = TestBed.createComponent(ProductionLine);
-      const store = fixture.debugElement.injector.get(ProductionLineStore);
-      for (const id of ['first', 'second', 'third']) {
-        store.addProduct({ id, arrivedAt: new Date('2026-01-01T10:00:00Z'), status: 'В очереди' });
-      }
-      await fixture.whenStable();
-
-      const button = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('app-line-controls button')!;
-      button.click();
-
-      expect(animate).toHaveBeenCalledTimes(2);
-      expect(animate.mock.calls[0][0]).toEqual([
-        { transform: 'translateX(0)' },
-        { transform: 'translateX(1.5rem)', offset: 0.7 },
-        { transform: 'translateX(0)' },
-      ]);
-      expect(store.products().map((product) => product.id)).toEqual(['second', 'third']);
-      expect(store.events()[0].type).toBe('removed-on-tick');
-    } finally {
-      if (originalAnimate) {
-        Object.defineProperty(HTMLElement.prototype, 'animate', originalAnimate);
-      } else {
-        delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
-      }
+  it('moves each surviving card toward the exit, then closes the entry gap', async () => {
+    const fixture = TestBed.createComponent(ProductionLine);
+    const store = fixture.debugElement.injector.get(ProductionLineStore);
+    const arrivedAt = new Date('2026-01-01T10:00:00Z');
+    for (const id of ['first', 'second', 'third']) {
+      store.addProduct({ id, arrivedAt, status: 'В очереди' });
     }
+    await fixture.whenStable();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const slots = () => [...element.querySelectorAll<HTMLElement>('.products > li')].map((card) => [
+      card.querySelector('h3')?.textContent,
+      card.style.getPropertyValue('--slot'),
+    ]);
+    expect(slots()).toEqual([['third', '0'], ['second', '1'], ['first', '2']]);
+
+    element.querySelector<HTMLButtonElement>('app-line-controls button')!.click();
+    expect(store.products().map((product) => product.id)).toEqual(['second', 'third']);
+    await fixture.whenStable();
+    expect(slots()).toEqual([['third', '1'], ['second', '2']]);
+    expect(store.events()[0].type).toBe('removed-on-tick');
+
+    await new Promise((resolve) => setTimeout(resolve, 520));
+    await fixture.whenStable();
+    expect(slots()).toEqual([['third', '0'], ['second', '1']]);
+
+    store.addProduct({ id: 'fourth', arrivedAt, status: 'В очереди' });
+    await fixture.whenStable();
+    expect(slots()).toEqual([['fourth', '0'], ['third', '1'], ['second', '2']]);
+
+    element.querySelector<HTMLButtonElement>('app-line-controls button')!.click();
+    await fixture.whenStable();
+    expect(store.products().map((product) => product.id)).toEqual(['third', 'fourth']);
+    expect(slots()).toEqual([['fourth', '1'], ['third', '2']]);
+
+    await new Promise((resolve) => setTimeout(resolve, 520));
+    await fixture.whenStable();
+    expect(slots()).toEqual([['fourth', '0'], ['third', '1']]);
   });
 
   it('renders a new journal entry after a product is added', async () => {

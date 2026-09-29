@@ -7,9 +7,9 @@ import { ProductionLineStore } from '../production-line-store';
   imports: [FormField],
   template: `
     <section aria-labelledby="add-product-heading">
-      <p class="eyebrow">01 / Вход линии</p>
+      <p class="eyebrow"><span aria-hidden="true">✳</span> БЫСТРОЕ ДЕЙСТВИЕ</p>
       <h2 id="add-product-heading">Добавить продукт</h2>
-      <p class="hint">Новый продукт займёт место у датчика входа.</p>
+      <p class="hint">Новый продукт появится у датчика входа.</p>
       <form (submit)="onSubmit($event)">
         <label for="product-id">ID продукта</label>
         <input
@@ -24,27 +24,29 @@ import { ProductionLineStore } from '../production-line-store';
         @if (productForm.productId().touched() && productForm.productId().errors().length) {
           <p id="product-id-error" role="alert">{{ productForm.productId().errors()[0].message }}</p>
         }
-        <button type="submit">Добавить в очередь <span aria-hidden="true">↗</span></button>
+        <button type="submit">Добавить в очередь <span aria-hidden="true">→</span></button>
       </form>
     </section>
   `,
   styles: `
     :host { display: block; min-width: 0; }
-    section { height: 100%; padding: 1.4rem; border: 1px solid #d3dcdf; border-radius: 16px; background: #fff; box-shadow: 0 4px 18px #1b3b4510; }
-    .eyebrow { margin: 0 0 .65rem; color: #246c69; font-family: ui-monospace, monospace; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-    h2 { margin: 0; color: #162e39; font-size: 1.25rem; letter-spacing: -.025em; }
-    .hint { margin: .4rem 0 1.25rem; color: #52656d; font-size: .88rem; line-height: 1.45; }
-    form { display: grid; gap: .6rem; }
-    label { color: #243a45; font-size: .82rem; font-weight: 750; }
-    input { width: 100%; min-height: 46px; padding: .7rem .8rem; border: 1px solid #94aab0; border-radius: 8px; background: #f8fbfb; color: #172b39; outline: none; }
-    input::placeholder { color: #667b83; }
-    input:focus-visible { border-color: #176e68; box-shadow: 0 0 0 3px #176e6833; }
-    input[aria-invalid='true'] { border-color: #aa3535; }
-    [role='alert'] { margin: 0; color: #9d2929; font-size: .82rem; font-weight: 650; }
-    button { display: flex; justify-content: space-between; align-items: center; min-height: 46px; margin-top: .3rem; padding: .7rem .85rem; border: 0; border-radius: 8px; background: #176e68; color: #fff; font-weight: 750; cursor: pointer; }
-    button:hover { background: #105752; }
-    button:focus-visible { outline: 3px solid #176e68; outline-offset: 3px; }
+    section { height: 100%; padding: 1.25rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); box-shadow: var(--shadow); }
+    .eyebrow { display: flex; align-items: center; gap: .35rem; margin: 0 0 .75rem; color: #2f7058; font-family: ui-monospace, monospace; font-size: .62rem; font-weight: 800; letter-spacing: .09em; }
+    .eyebrow span { color: #498362; font-size: 1rem; line-height: .7; }
+    h2 { margin: 0; color: var(--ink); font-size: 1.25rem; font-weight: 800; letter-spacing: -.04em; line-height: 1.15; }
+    .hint { margin: .5rem 0 1.3rem; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+    form { display: grid; gap: .55rem; }
+    label { color: #36584a; font-size: .72rem; font-weight: 800; }
+    input { width: 100%; min-height: 46px; padding: .68rem .75rem; border: 1px solid #c4d4c8; border-radius: 7px; background: #fafcf8; color: var(--ink); outline: none; }
+    input::placeholder { color: #72837a; }
+    input:focus-visible { border-color: var(--green); box-shadow: 0 0 0 3px #17695830; }
+    input[aria-invalid='true'] { border-color: #ac4138; }
+    [role='alert'] { margin: 0; color: #9c352f; font-size: .75rem; font-weight: 700; line-height: 1.35; }
+    button { display: flex; align-items: center; justify-content: space-between; min-height: 46px; margin-top: .35rem; padding: .6rem .78rem; border: 0; border-radius: 7px; background: var(--green); color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; transition: background 160ms, transform 160ms; }
+    button:hover { background: #0c5547; transform: translateY(-1px); }
+    button:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
     button span { font-size: 1.2rem; line-height: 1; }
+    @media (prefers-reduced-motion: reduce) { button { transition: none; } }
   `,
 })
 export class ProductForm {
