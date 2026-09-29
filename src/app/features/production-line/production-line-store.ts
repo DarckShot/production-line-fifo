@@ -41,4 +41,14 @@ export class ProductionLineStore {
     this.productsState.update((products) => products.filter((product) => product.id !== id));
     return true;
   }
+
+  nextTick(): Product | undefined {
+    const departingProduct = this.products()[0];
+    if (!departingProduct) {
+      return undefined;
+    }
+
+    this.productsState.update((products) => products.slice(1));
+    return departingProduct;
+  }
 }

@@ -51,4 +51,16 @@ describe('ProductionLineStore', () => {
     expect(store.products()).toEqual([second]);
     expect(store.removeProduct('missing')).toBe(false);
   });
+
+  it('advances FIFO on each tick and safely handles an empty queue', () => {
+    expect(store.nextTick()).toBeUndefined();
+    store.addProduct(first);
+    store.addProduct(second);
+
+    expect(store.nextTick()).toEqual(first);
+    expect(store.products()).toEqual([second]);
+    expect(store.nextTick()).toEqual(second);
+    expect(store.products()).toEqual([]);
+    expect(store.nextTick()).toBeUndefined();
+  });
 });

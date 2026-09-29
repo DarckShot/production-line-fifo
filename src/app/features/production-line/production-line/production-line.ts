@@ -18,7 +18,7 @@ import { ProductionLineStore } from '../production-line-store';
       </header>
       <div class="tools">
         <app-product-form />
-        <app-line-controls />
+        <app-line-controls [productCount]="store.products().length" (tickRequested)="store.nextTick()" />
       </div>
       <app-product-queue [products]="store.products()" (statusChanged)="store.changeProductStatus($event.id, $event.status)" (removed)="store.removeProduct($event)" />
       <app-event-log [events]="store.events()" />

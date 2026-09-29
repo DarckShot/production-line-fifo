@@ -58,4 +58,35 @@ describe('ProductionLine status selection', () => {
     expect(element.querySelector('button[aria-label="Удалить продукт middle"]')).toBeNull();
     expect(element.textContent).toContain('Продуктов: 2');
   });
+
+  it('advances products toward the exit and removes the oldest on each click', async () => {
+    const fixture = TestBed.createComponent(ProductionLine);
+    const store = fixture.debugElement.injector.get(ProductionLineStore);
+    const arrivedAt = new Date('2026-01-01T10:00:00Z');
+    const element = fixture.nativeElement as HTMLElement;
+    const tickButton = element.querySelector<HTMLButtonElement>('app-line-controls button')!;
+    await fixture.whenStable();
+    expect(tickButton.disabled).toBe(true);
+
+    for (const id of ['first', 'second', 'third']) {
+      store.addProduct({ id, arrivedAt, status: 'В очереди' });
+    }
+    await fixture.whenStable();
+    expect(tickButton.disabled).toBe(false);
+
+    tickButton.click();
+    await fixture.whenStable();
+    expect(store.products().map((product) => product.id)).toEqual(['second', 'third']);
+    expect([...element.querySelectorAll('app-product-card h3')].map((heading) => heading.textContent)).toEqual([
+      'third',
+      'second',
+    ]);
+
+    tickButton.click();
+    tickButton.click();
+    await fixture.whenStable();
+    expect(store.products()).toEqual([]);
+    expect(tickButton.disabled).toBe(true);
+    expect(element.textContent).toContain('Очередь пуста');
+  });
 });
