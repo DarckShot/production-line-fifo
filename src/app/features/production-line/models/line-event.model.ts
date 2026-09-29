@@ -1,6 +1,8 @@
 import type { Product } from './product.model';
 
-export type LineEventType = 'added' | 'status-changed' | 'removed-manually' | 'removed-on-tick';
+export const LINE_EVENT_TYPES = ['added', 'status-changed', 'removed-manually', 'removed-on-tick'] as const;
+
+export type LineEventType = (typeof LINE_EVENT_TYPES)[number];
 
 export interface LineEvent {
   readonly id: string;

@@ -1,4 +1,5 @@
 import type { Product } from './models/product.model';
+import { PRODUCTION_LINE_STORAGE_KEY } from './production-line-persistence';
 import { ProductionLineStore } from './production-line-store';
 
 describe('ProductionLineStore', () => {
@@ -15,6 +16,7 @@ describe('ProductionLineStore', () => {
   };
 
   beforeEach(() => {
+    localStorage.clear();
     store = new ProductionLineStore();
   });
 
@@ -108,5 +110,66 @@ describe('ProductionLineStore', () => {
     expect(store.events()).toHaveLength(20);
     expect(store.events()[0].productId).toBe('25');
     expect(store.events()[0].type).toBe('added');
+  });
+
+  it('restores products, statuses, dates, and events after a reload', () => {
+    store.addProduct(first);
+    expect(new ProductionLineStore().products()).toEqual([first]);
+    store.addProduct(second);
+    store.changeProductStatus('first', 'Отбракован');
+    expect(new ProductionLineStore().products()[0].status).toBe('Отбракован');
+    store.removeProduct('second');
+    expect(new ProductionLineStore().products()).toHaveLength(1);
+
+    const restored = new ProductionLineStore();
+    expect(restored.products()).toEqual([{ ...first, status: 'Отбракован' }]);
+    expect(restored.products()[0].arrivedAt).toBeInstanceOf(Date);
+    expect(restored.events()).toEqual(store.events());
+    expect(restored.events()[0].occurredAt).toBeInstanceOf(Date);
+
+    restored.nextTick();
+    expect(new ProductionLineStore().products()).toEqual([]);
+    expect(new ProductionLineStore().events()[0].type).toBe('removed-on-tick');
+    expect(new ProductionLineStore().events()[0].id).toBe('5');
+  });
+
+  it('restores only the latest 20 events after a reload', () => {
+    for (let index = 1; index <= 25; index += 1) {
+      store.addProduct({ ...first, id: String(index) });
+    }
+
+    const restored = new ProductionLineStore();
+    expect(restored.events()).toHaveLength(20);
+    expect(restored.events()[0].productId).toBe('25');
+    expect(restored.events()[19].productId).toBe('6');
+    restored.removeProduct('25');
+    expect(restored.events()[0].id).toBe('26');
+  });
+
+  it('starts empty when storage is absent or damaged', () => {
+    expect(store.products()).toEqual([]);
+    expect(store.events()).toEqual([]);
+
+    localStorage.setItem(PRODUCTION_LINE_STORAGE_KEY, '{broken json');
+    const restored = new ProductionLineStore();
+    expect(restored.products()).toEqual([]);
+    expect(restored.events()).toEqual([]);
+    restored.addProduct(first);
+    expect(new ProductionLineStore().products()).toEqual([first]);
+  });
+
+  it('ignores saved data with an invalid product status or date', () => {
+    localStorage.setItem(
+      PRODUCTION_LINE_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        products: [{ id: 'broken', arrivedAt: 'not-a-date', status: 'Неизвестен' }],
+        events: [],
+      }),
+    );
+
+    const restored = new ProductionLineStore();
+    expect(restored.products()).toEqual([]);
+    expect(restored.events()).toEqual([]);
   });
 });

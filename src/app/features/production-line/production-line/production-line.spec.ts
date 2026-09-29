@@ -3,6 +3,10 @@ import { ProductionLineStore } from '../production-line-store';
 import { ProductionLine } from './production-line';
 
 describe('ProductionLine status selection', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('updates only the chosen product without changing FIFO order', async () => {
     const fixture = TestBed.createComponent(ProductionLine);
     const store = fixture.debugElement.injector.get(ProductionLineStore);

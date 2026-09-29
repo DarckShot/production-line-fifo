@@ -4,6 +4,7 @@ import { ProductionLineStore } from '../production-line-store';
 
 describe('ProductForm', () => {
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({
       imports: [ProductForm],
       providers: [ProductionLineStore],

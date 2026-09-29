@@ -1,12 +1,14 @@
 import { Service, signal } from '@angular/core';
 import type { LineEvent, LineEventType } from './models/line-event.model';
 import type { Product, ProductStatus } from './models/product.model';
+import { loadProductionLineState, saveProductionLineState } from './production-line-persistence';
 
 @Service()
 export class ProductionLineStore {
-  private readonly productsState = signal<readonly Product[]>([]);
-  private readonly eventsState = signal<readonly LineEvent[]>([]);
-  private nextEventId = 0;
+  private readonly restoredState = loadProductionLineState();
+  private readonly productsState = signal<readonly Product[]>(this.restoredState.products);
+  private readonly eventsState = signal<readonly LineEvent[]>(this.restoredState.events);
+  private nextEventId = this.restoredState.nextEventId;
 
   readonly products = this.productsState.asReadonly();
   readonly events = this.eventsState.asReadonly();
@@ -78,5 +80,6 @@ export class ProductionLineStore {
       description,
     };
     this.eventsState.update((events) => [event, ...events].slice(0, 20));
+    saveProductionLineState(this.products(), this.events());
   }
 }
