@@ -15,32 +15,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-and-build:
-    name: Test and build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  format:
+    name: Formatting
+    runs-on: &runner ubuntu-latest
+    timeout-minutes: &timeout 15
     steps:
-      - name: Checkout repository
+      - &checkout
+        name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up Node.js and cache npm
+      - &setup-node
+        name: Set up Node.js and cache npm
         uses: actions/setup-node@v7
         with:
           node-version: '22.22.3'
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
+      - &install
+        name: Install dependencies
         run: npm ci
 
       - name: Check formatting
         run: npm run format:check
 
+  lint:
+    name: Lint
+    needs: format
+    runs-on: *runner
+    timeout-minutes: *timeout
+    steps:
+      - *checkout
+      - *setup-node
+      - *install
+
       - name: Lint TypeScript and Angular templates
         run: npm run lint
 
+  unit-tests:
+    name: Unit tests
+    needs: lint
+    runs-on: *runner
+    timeout-minutes: *timeout
+    steps:
+      - *checkout
+      - *setup-node
+      - *install
+
       - name: Run unit tests
         run: npm test -- --watch=false
+
+  build:
+    name: Production build
+    needs: unit-tests
+    runs-on: *runner
+    timeout-minutes: *timeout
+    steps:
+      - *checkout
+      - *setup-node
+      - *install
 
       - name: Build Angular for production
         run: npm run build
