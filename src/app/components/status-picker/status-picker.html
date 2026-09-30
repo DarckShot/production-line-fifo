@@ -35,7 +35,6 @@
     role="listbox"
     [attr.aria-label]="'Статус продукта ' + productId()"
     (dismissed)="closeMenu($event === 'escape')"
-    (keydown)="onMenuKeydown($event)"
   >
     @for (option of statuses; track option) {
       <li
@@ -43,6 +42,7 @@
         tabindex="-1"
         [attr.aria-selected]="option === status()"
         (click)="chooseStatus(option)"
+        (keydown)="onMenuKeydown($event)"
       >
         {{ option }}
       </li>

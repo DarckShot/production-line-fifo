@@ -13,8 +13,22 @@
   --shadow: 0 12px 36px #153d3010;
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; }
-button, input, select { font: inherit; }
-button { touch-action: manipulation; }
-::selection { background: #d8ed85; color: #19312e; }
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  touch-action: manipulation;
+}
+::selection {
+  background: #d8ed85;
+  color: #19312e;
+}

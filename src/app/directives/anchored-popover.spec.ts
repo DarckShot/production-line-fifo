@@ -7,8 +7,8 @@ import { AnchoredPopover } from './anchored-popover';
   imports: [AnchoredPopover],
   template: `
     <div class="track">
-      <label>Статус</label>
-      <button #origin type="button">Изменить</button>
+      <label for="status-trigger">Статус</label>
+      <button id="status-trigger" #origin type="button">Изменить</button>
       <ul [appAnchoredPopover]="origin" popover="manual"></ul>
     </div>
   `,

@@ -116,8 +116,8 @@ export class StatusPicker {
   }
 
   private focusOption(index: number): void {
-    this.statusMenu()
-      ?.nativeElement.querySelectorAll<HTMLElement>('[role="option"]')
-      [index]?.focus({ preventScroll: true });
+    const options =
+      this.statusMenu()?.nativeElement.querySelectorAll<HTMLElement>('[role="option"]');
+    options?.[index]?.focus({ preventScroll: true });
   }
 }

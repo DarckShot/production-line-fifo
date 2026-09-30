@@ -5,6 +5,12 @@ import { StatusPicker } from './status-picker';
 describe('StatusPicker', () => {
   afterEach(() => vi.restoreAllMocks());
 
+  function pressKeyOnFocusedOption(key: string): KeyboardEvent {
+    const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+    (document.activeElement as HTMLElement).dispatchEvent(event);
+    return event;
+  }
+
   function setup(status: ProductStatus = 'В очереди') {
     const fixture = TestBed.createComponent(StatusPicker);
     fixture.componentRef.setInput('productId', 'PRD-1');
@@ -63,7 +69,7 @@ describe('StatusPicker', () => {
   });
 
   it('supports Arrow, Home, End and Enter keyboard selection', async () => {
-    const { fixture, trigger, menu, options } = setup('Проверен');
+    const { fixture, trigger, options } = setup('Проверен');
     const changed = vi.fn();
     fixture.componentInstance.statusChanged.subscribe(changed);
     await fixture.whenStable();
@@ -73,16 +79,16 @@ describe('StatusPicker', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
     expect(document.activeElement).toBe(options()[1]);
 
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+    pressKeyOnFocusedOption('End');
     expect(document.activeElement).toBe(options()[2]);
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    pressKeyOnFocusedOption('ArrowDown');
     expect(document.activeElement).toBe(options()[0]);
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+    pressKeyOnFocusedOption('ArrowUp');
     expect(document.activeElement).toBe(options()[2]);
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+    pressKeyOnFocusedOption('Home');
     expect(document.activeElement).toBe(options()[0]);
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    pressKeyOnFocusedOption('End');
+    pressKeyOnFocusedOption('Enter');
     await fixture.whenStable();
 
     expect(changed).toHaveBeenCalledExactlyOnceWith('Отбракован');
@@ -91,16 +97,16 @@ describe('StatusPicker', () => {
   });
 
   it('supports opening with ArrowUp and choosing an option with Space', async () => {
-    const { fixture, trigger, menu, options } = setup();
+    const { fixture, trigger, options } = setup();
     const changed = vi.fn();
     fixture.componentInstance.statusChanged.subscribe(changed);
     await fixture.whenStable();
 
     trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
     expect(document.activeElement).toBe(options()[0]);
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+    pressKeyOnFocusedOption('ArrowUp');
     expect(document.activeElement).toBe(options()[2]);
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    pressKeyOnFocusedOption(' ');
     await fixture.whenStable();
 
     expect(changed).toHaveBeenCalledExactlyOnceWith('Отбракован');
@@ -140,20 +146,19 @@ describe('StatusPicker', () => {
   });
 
   it('closes on Escape with focus restoration and on Tab without trapping focus', async () => {
-    const { fixture, trigger, menu } = setup();
+    const { fixture, trigger } = setup();
     await fixture.whenStable();
 
     trigger.click();
     await fixture.whenStable();
-    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    pressKeyOnFocusedOption('Escape');
     await fixture.whenStable();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(trigger);
 
     trigger.click();
     await fixture.whenStable();
-    const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
-    menu.dispatchEvent(tab);
+    const tab = pressKeyOnFocusedOption('Tab');
     await fixture.whenStable();
     expect(tab.defaultPrevented).toBe(false);
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
