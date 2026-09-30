@@ -1,4 +1,4 @@
-name: Angular CI
+name: Angular CI and Pages
 
 on:
   pull_request:
@@ -76,4 +76,30 @@ jobs:
       - *install
 
       - name: Build Angular for production
-        run: npm run build
+        run: npm run build -- --base-href /production-line-fifo/
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/production-line-fifo/browser
+
+  deploy:
+    name: Deploy GitHub Pages
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: *runner
+    timeout-minutes: *timeout
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
