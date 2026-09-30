@@ -1,0 +1,47 @@
+<div class="track-toolbar">
+  <span>ДВИЖЕНИЕ ПРОДУКТОВ</span>
+  <div class="track-navigation">
+    <button type="button" (click)="scrollToStart()" [disabled]="!products().length">← Вход</button>
+    <button type="button" (click)="scrollToExit()" [disabled]="!products().length">Выход →</button>
+  </div>
+</div>
+<div
+  #track
+  class="track"
+  role="region"
+  [attr.tabindex]="products().length ? 0 : null"
+  aria-label="Лента продуктов; прокручивается по горизонтали"
+>
+  @if (products().length) {
+    <ol
+      class="products"
+      [class.settling]="motion.settling()"
+      [style.--slots]="motion.slotCount()"
+      aria-label="Продукты от входа к выходу"
+      animate.leave="products-leaving"
+    >
+      @for (product of productsFromEntryToExit(); track product.id) {
+        <li
+          [style.--slot]="motion.slotOf(product.id)"
+          animate.enter="product-enter"
+          animate.leave="product-leaving"
+        >
+          <app-product-card
+            [product]="product"
+            (statusChanged)="statusChanged.emit({ id: product.id, status: $event })"
+            (removed)="removed.emit(product.id)"
+          />
+        </li>
+      }
+    </ol>
+  } @else {
+    <div class="empty-state" role="status">
+      <span class="empty-icon" aria-hidden="true">↗</span>
+      <strong>Линия готова к работе</strong>
+      <span>Очередь пуста. Добавьте продукт, чтобы запустить линию.</span>
+    </div>
+  }
+</div>
+<p class="track-hint">
+  Карточки движутся от входа к датчику отбраковки. Ленту можно прокручивать горизонтально.
+</p>

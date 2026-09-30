@@ -1,0 +1,13 @@
+<section aria-labelledby="line-controls-heading">
+  <p class="eyebrow">УПРАВЛЕНИЕ ПОТОКОМ</p>
+  <h2 id="line-controls-heading">Следующий такт</h2>
+  <p>Продукты сдвинутся к выходу. Крайний продукт покинет линию.</p>
+  <div class="control-footer">
+    <span class="count"
+      >В очереди <strong>{{ productCount() }}</strong></span
+    >
+    <button type="button" [disabled]="productCount() === 0" (click)="tickRequested.emit()">
+      Следующий такт <span aria-hidden="true">→</span>
+    </button>
+  </div>
+</section>

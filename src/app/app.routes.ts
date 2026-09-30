@@ -4,7 +4,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./features/production-line/production-line/production-line').then(
+      import('./components/production-line/production-line').then(
         (module) => module.ProductionLine,
       ),
   },

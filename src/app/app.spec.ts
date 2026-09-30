@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { App } from './app';
-import { routes } from './app.routes';
+import { appConfig } from './app.config';
 
 describe('App', () => {
   beforeEach(async () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes)],
+      providers: appConfig.providers,
     }).compileComponents();
   });
 

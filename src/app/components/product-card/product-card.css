@@ -1,0 +1,150 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.product-card {
+  --state: #5988f8e2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.85rem;
+  border: 1px solid #d5e2d9;
+  border-top: 4px solid var(--state);
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 8px 20px #1c493124;
+}
+
+.product-card.card--checked {
+  --state: #2a7e49;
+}
+
+.product-card.card--rejected {
+  --state: #b24e43;
+}
+
+.card-head {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.card-label {
+  margin: 0;
+  color: #62796d;
+  font-family: ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+  padding: 0.23rem 0.45rem;
+  border-radius: 4px;
+  background: #5988f81f;
+  color: #315eaf;
+  font-size: 0.65rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status::before {
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: currentColor;
+  content: '';
+}
+
+.status--checked {
+  background: #e3f2e7;
+  color: #216640;
+}
+
+.status--rejected {
+  background: #fae8e5;
+  color: #9c352f;
+}
+
+h3 {
+  max-height: 3.1rem;
+  min-height: 1.6rem;
+  margin: 0.55rem 0 0.75rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  color: #17342d;
+  font-size: 1.12rem;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+
+dl {
+  margin: 0;
+  padding: 0.55rem 0;
+  border-top: 1px solid #e5ede6;
+}
+
+dt {
+  color: #65776d;
+  font-size: 0.66rem;
+}
+
+dd {
+  margin: 0.22rem 0 0;
+  color: #203e32;
+  font-family: ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-actions {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: auto;
+}
+
+.remove-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  padding: 0.45rem 0.7rem 0.45rem 0.65rem;
+  border: 1px solid #e4c9c3;
+  border-radius: 7px;
+  background: #fff9f8;
+  color: #9c352f;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.remove-button:hover {
+  background: #fae8e5;
+}
+
+.remove-button:active {
+  background: #f3dcd7;
+}
+
+.remove-button:focus-visible {
+  outline: 2px solid #9c352f;
+  outline-offset: 2px;
+}
+
+.remove-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  pointer-events: none;
+}

@@ -1,0 +1,38 @@
+<section class="line-panel" aria-labelledby="queue-heading">
+  <div class="panel-heading">
+    <div>
+      <p class="eyebrow">ЛЕНТА ПРОДУКТОВ <span aria-hidden="true">/</span> FIFO-01</p>
+      <h2 id="queue-heading">Поток линии</h2>
+    </div>
+    <p class="queue-count"><span aria-hidden="true"></span> Продуктов: {{ products().length }}</p>
+  </div>
+
+  <div
+    class="line-route"
+    role="group"
+    aria-label="Направление движения: от датчика входа к датчику отбраковки"
+  >
+    <div class="sensor">
+      <span class="sensor-light sensor-light--entry" aria-hidden="true"></span>
+      <span><small>01 / ВХОД</small>Датчик входа</span>
+    </div>
+    <div class="direction" aria-hidden="true">
+      <span class="direction-line"></span>
+      <span class="direction-arrow">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M4 12h15m-6-6 6 6-6 6" />
+        </svg>
+      </span>
+    </div>
+    <div class="sensor sensor--exit">
+      <span class="sensor-light sensor-light--exit" aria-hidden="true"></span>
+      <span><small>02 / ВЫХОД</small>Датчик отбраковки</span>
+    </div>
+  </div>
+
+  <app-product-track
+    [products]="products()"
+    (statusChanged)="statusChanged.emit($event)"
+    (removed)="removed.emit($event)"
+  />
+</section>

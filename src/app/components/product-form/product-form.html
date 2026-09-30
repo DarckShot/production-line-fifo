@@ -1,0 +1,25 @@
+<section aria-labelledby="add-product-heading">
+  <p class="eyebrow"><span aria-hidden="true">✳</span> БЫСТРОЕ ДЕЙСТВИЕ</p>
+  <h2 id="add-product-heading">Добавить продукт</h2>
+  <p class="hint">Новый продукт появится у датчика входа.</p>
+  <form (submit)="onSubmit($event)">
+    <label for="product-id">ID продукта</label>
+    <input
+      id="product-id"
+      type="text"
+      placeholder="Например, PRD-042"
+      autocomplete="off"
+      [formField]="productForm.productId"
+      [attr.aria-invalid]="productForm.productId().touched() && productForm.productId().invalid()"
+      [attr.aria-describedby]="
+        productForm.productId().touched() && productForm.productId().invalid()
+          ? 'product-id-error'
+          : null
+      "
+    />
+    @if (productForm.productId().touched() && productForm.productId().errors().length) {
+      <p id="product-id-error" role="alert">{{ productForm.productId().errors()[0].message }}</p>
+    }
+    <button type="submit">Добавить в очередь <span aria-hidden="true">→</span></button>
+  </form>
+</section>

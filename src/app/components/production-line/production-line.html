@@ -1,0 +1,42 @@
+<main class="page">
+  <header class="page-header">
+    <div class="topbar">
+      <div class="brand">
+        <img
+          class="brand-mark"
+          ngSrc="/favicon.svg"
+          width="38"
+          height="38"
+          alt=""
+          [priority]="true"
+        />
+        <span class="brand-name">FLOWLINE <small>ПРОИЗВОДСТВО</small></span>
+      </div>
+      <span class="live-status"><span aria-hidden="true"></span> Линия активна</span>
+    </div>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">ПАНЕЛЬ УПРАВЛЕНИЯ <span aria-hidden="true">/</span> FIFO-01</p>
+        <h1>Производственная линия</h1>
+        <p>Контролируйте путь каждого продукта — от датчика входа до выхода линии.</p>
+      </div>
+      <div class="hero-stat">
+        <span>СЕЙЧАС В ОЧЕРЕДИ</span>
+        <strong>{{ store.products().length }}</strong>
+        <small>{{ store.products().length | productNoun }} на линии</small>
+      </div>
+    </div>
+  </header>
+  <div class="dashboard">
+    <div class="tools">
+      <app-product-form />
+      <app-line-controls [productCount]="store.products().length" (tickRequested)="onNextTick()" />
+    </div>
+    <app-product-queue
+      [products]="store.products()"
+      (statusChanged)="store.changeProductStatus($event.id, $event.status)"
+      (removed)="store.removeProduct($event)"
+    />
+    <app-event-log [events]="store.events()" />
+  </div>
+</main>

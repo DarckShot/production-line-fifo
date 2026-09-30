@@ -1,0 +1,50 @@
+<article
+  class="product-card"
+  [class.card--checked]="product().status === 'Проверен'"
+  [class.card--rejected]="product().status === 'Отбракован'"
+>
+  <div class="card-head">
+    <p class="card-label">ПРОДУКТ</p>
+    <span
+      class="status"
+      [class.status--checked]="product().status === 'Проверен'"
+      [class.status--rejected]="product().status === 'Отбракован'"
+    >
+      {{ product().status }}
+    </span>
+  </div>
+  <h3 [attr.title]="product().id">{{ product().id }}</h3>
+  <dl>
+    <div>
+      <dt>Время поступления</dt>
+      <dd>
+        <time [attr.datetime]="product().arrivedAt.toISOString()">{{
+          product().arrivedAt | date: 'dd.MM.yyyy HH:mm'
+        }}</time>
+      </dd>
+    </div>
+  </dl>
+  <div class="card-actions">
+    <app-status-picker
+      [productId]="product().id"
+      [status]="product().status"
+      (statusChanged)="statusChanged.emit($event)"
+    />
+    <button
+      type="button"
+      class="remove-button"
+      [attr.aria-label]="'Удалить продукт ' + product().id"
+      (click)="removed.emit()"
+    >
+      Удалить
+      <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+        <path
+          d="m4.5 4.5 7 7m0-7-7 7"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+  </div>
+</article>

@@ -1,0 +1,39 @@
+<section aria-labelledby="event-log-heading">
+  <p class="eyebrow">ИСТОРИЯ ОПЕРАЦИЙ</p>
+  <div class="log-title">
+    <h2 id="event-log-heading">Журнал событий</h2>
+    <span>{{ recentEvents().length }} / 20</span>
+  </div>
+  @if (recentEvents().length) {
+    <p class="order-hint">Новые события — сверху</p>
+    <ul class="entries" tabindex="0" aria-label="Последние события линии">
+      @for (event of recentEvents(); track event.id; let isFirst = $first) {
+        <li
+          [class.latest]="isFirst"
+          [class.entry--removed]="
+            event.type === 'removed-manually' || event.type === 'removed-on-tick'
+          "
+          [class.entry--status]="event.type === 'status-changed'"
+        >
+          <span class="entry-dot" aria-hidden="true"></span>
+          <div class="entry-content">
+            <div class="entry-heading">
+              <time [attr.datetime]="event.occurredAt.toISOString()">{{
+                event.occurredAt | date: 'dd.MM.yyyy HH:mm:ss'
+              }}</time>
+              @if (isFirst) {
+                <span class="latest-label">Последнее событие</span>
+              }
+            </div>
+            <p class="description">{{ event.description }}</p>
+            @if (event.productId) {
+              <p class="product-id">ID продукта: {{ event.productId }}</p>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty-state">Событий пока нет</p>
+  }
+</section>
