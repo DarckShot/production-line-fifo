@@ -1,5 +1,7 @@
 # Production Line FIFO
 
+[![Open App](https://img.shields.io/badge/OPEN%20APP-GitHub%20Pages-2ea44f?style=for-the-badge)](https://darckshot.github.io/production-line-fifo/)
+
 SPA на Angular для визуализации FIFO-очереди продуктов на производственной линии. Экран показывает движение от датчика входа к датчику отбраковки, позволяет управлять продуктами и отслеживать события линии.
 
 ## Возможности
